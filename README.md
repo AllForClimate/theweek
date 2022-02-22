@@ -7,6 +7,11 @@ Facilitate the organization of watch parties within DAOs. Reward people for orga
 ## Why?
 DAOs are looking for ways to create more relationship between their members. Organizing a watch party is a great opportunity to create a shared experience, it's a team bonding exercise, an opportunity to get to know new people in the community with whom we may work together on some projects in the future.
 
+## Working group
+
+- [Meeting notes](https://docs.google.com/document/d/1KaIXM17XQCDCiD4lxVLoVjd34-GBtZwy3_pkWrSa17g/edit#)
+- Discord: https://discord.allforclimate.earth #developers-for-climate
+
 ## User story (MVP)
 
 I'm a member of a DAO (e.g. Gitcoin DAO) and I see a link that invites me to watch together with fellow Gitcoin DAO members THE WEEK, a 3-episode documentary on the Climate Emergency. I click and I see different possible cohorts (e.g. next Monday/Tuesday/Wednesday 8pm CET, next Tuesday/Wednesday/Thurday 9pm CET, etc.).
