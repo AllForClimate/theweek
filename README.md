@@ -31,5 +31,5 @@ At the end, the stake is refunded to everyone and people receive THEWEEK tokens 
 The facilitator also gets the same amount of tokens.
 
 ## Design
-- [UX wirefeame](https://www.figma.com/file/Ce06zZ2wB5I5WuT3rq7WP8/theweek?node-id=0%3A1)
+- [UX wireframe](https://www.figma.com/file/Ce06zZ2wB5I5WuT3rq7WP8/theweek?node-id=0%3A1)
 
