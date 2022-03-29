@@ -4,7 +4,7 @@ import FacilitatorDashboard from './components/facilitatorDashboard'
 import ParticipantDashboard from './components/participantDashboard'
 
 export default function Home() {
-  const [state, setState] = useAppContext()
+  const [state] = useAppContext()
 
   if(state.address){
     if(state.isFacilitator) {
