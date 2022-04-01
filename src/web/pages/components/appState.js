@@ -23,7 +23,7 @@ export function AppWrapper({ children }) {
           signer, 
           autoConnecting: false, 
           isFacilitator: signerIsFacilitator,
-          connectFailure: null
+          errorMsg: null
         })
     } catch (ex) {
         console.log(ex)
@@ -34,7 +34,7 @@ export function AppWrapper({ children }) {
         }
         mergeWithState({ 
           autoConnecting: false, 
-          connectFailure: errorMsg, 
+          errorMsg, 
           triedConnected: true // Prevents endlessly retrying to connect
         })
     }
@@ -60,24 +60,24 @@ export function AppWrapper({ children }) {
   }
 
   useEffect(async () => {
-    if(!state.address && localStorage.getItem('address') && !state.autoConnecting && !state.connectFailure && !state.triedConnected) {
+    if(!state.address && localStorage.getItem('address') && !state.autoConnecting && !state.errorMsg && !state.triedConnected) {
       mergeWithState({ autoConnecting: true })
       await state.tryConnect()
     }
   })
 
-  const dismissErrorMsg = () => mergeWithState({ connectFailure : null })
+  const dismissErrorMsg = () => mergeWithState({ errorMsg : null })
 
   return (
     <AppContext.Provider value={[state, setState]}>
       <Snackbar
-        open={!!state.connectFailure}
+        open={!!state.errorMsg}
         autoHideDuration={60000}
         onClose={dismissErrorMsg}
-        message={state.connectFailure}
+        message={state.errorMsg}
       >
         <Alert onClose={dismissErrorMsg} severity="error">
-            {state.connectFailure}
+            {state.errorMsg}
             <Button color="secondary" size="small" onClick={tryConnect}>
               Try again
             </Button>
