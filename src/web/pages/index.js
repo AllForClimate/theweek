@@ -7,7 +7,7 @@ import { Container } from '@mui/material'
 export default function Home() {
   const [state] = useAppContext()
 
-  if(state.address){
+  if(state.walletAddress){
     let component
     if(state.isFacilitator) {
       component = <FacilitatorDashboard />

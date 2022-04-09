@@ -15,15 +15,15 @@ export function AppWrapper({ children }) {
         provider = new ethers.providers.Web3Provider(ethereum)
         await provider.send("eth_requestAccounts", [])
         const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        localStorage.setItem('address', address)
+        const walletAddress = await signer.getAddress()
+        localStorage.setItem('walletAddress', walletAddress)
         const signerIsFacilitator = await isFacilitator(signer)
-        mergeWithState({ 
-          address: address, 
+        mergeWithState(state, { 
+          walletAddress, 
           signer, 
           autoConnecting: false, 
           isFacilitator: signerIsFacilitator,
-          errorMsg: null
+          errorMsg: null, buttonAction: null, buttonCaption: null
         })
     } catch (ex) {
         console.log(ex)
@@ -32,23 +32,40 @@ export function AppWrapper({ children }) {
         if(ex.code === 'CALL_EXCEPTION') {
           errorMsg = 'Failed to contact our smart contract. Is your wallet connected to the Polygon network ?'
         }
-        mergeWithState({ 
+        mergeWithState(state, { 
           autoConnecting: false, 
-          errorMsg, 
-          triedConnected: true // Prevents endlessly retrying to connect
+          errorMsg,
+          buttonCaption: 'Try again', buttonAction: tryConnect,
+          triedConnecting: true // Prevents endlessly retrying to connect
         })
     }
   }
-
-  const mergeWithState = newState => {
-    setState({...state, ...newState})
+  const mergeWithState = (oldState, newState) => {
+    setState({...oldState, ...newState})
   }
-  
+  const setError = (oldState, msg, buttonCaption, buttonAction) => {
+    const errorData = {
+      errorMsg: msg
+    }
+    if(buttonCaption && buttonAction) {
+      errorData.buttonCaption = buttonCaption
+      errorData.buttonAction = buttonAction
+    }
+    mergeWithState(oldState, errorData)
+  }
+
   const [state, setState] = useState({
-      address: null,
-      tryConnect,
-      mergeWithState,
-      autoConnecting:false
+    walletAddress: null,
+    tryConnect,
+    mergeWithState,
+    autoConnecting:false,
+    setError
+  })
+  useEffect(async () => {
+    if(!state.walletAddress && localStorage.getItem('walletAddress') && !state.autoConnecting && !state.errorMsg && !state.triedConnecting) {
+      mergeWithState(state, { autoConnecting: true })
+      await state.tryConnect()
+    }
   })
 
   const ensureWalletInitialized = () => {
@@ -59,14 +76,7 @@ export function AppWrapper({ children }) {
     }
   }
 
-  useEffect(async () => {
-    if(!state.address && localStorage.getItem('address') && !state.autoConnecting && !state.errorMsg && !state.triedConnected) {
-      mergeWithState({ autoConnecting: true })
-      await state.tryConnect()
-    }
-  })
-
-  const dismissErrorMsg = () => mergeWithState({ errorMsg : null })
+  const dismissErrorMsg = () => setError(state)
 
   return (
     <AppContext.Provider value={[state, setState]}>
@@ -78,9 +88,9 @@ export function AppWrapper({ children }) {
       >
         <Alert onClose={dismissErrorMsg} severity="error">
             {state.errorMsg}
-            <Button color="secondary" size="small" onClick={tryConnect}>
-              Try again
-            </Button>
+            {state.buttonCaption && <Button color="secondary" size="small" onClick={state.buttonAction}>
+              {state.buttonCaption}
+            </Button>}
         </Alert>
       </Snackbar>
       {children}

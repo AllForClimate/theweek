@@ -16,7 +16,7 @@ export default function Admin() {
         }
     })
 
-    if(state.address){
+    if(state.walletAddress){
         if(!facilitators) {
             return (
                 <Box sx={{ display: 'flex' }}>
@@ -34,9 +34,9 @@ export default function Admin() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {facilitators.map(address => (
+                        {facilitators.map(walletAddress => (
                             <TableRow>
-                                <TableCell>{address}</TableCell>
+                                <TableCell>{walletAddress}</TableCell>
                                 <TableCell><DeleteRounded onClick={() => {}}/></TableCell>
                             </TableRow>
                         ))}

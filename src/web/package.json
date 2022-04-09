@@ -16,10 +16,13 @@
     "@mui/material": "^5.5.0",
     "axios": "^0.26.1",
     "ethers": "^5.6.0",
+    "ipfs": "0.61.0",
     "luxon": "^2.3.1",
     "next": "12.1.0",
+    "orbit-db": "^0.28.3",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "winston": "^3.7.2"
   },
   "devDependencies": {
     "eslint": "8.10.0",
