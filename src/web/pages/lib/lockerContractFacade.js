@@ -19,3 +19,9 @@ export async function grantFacilitatorRole(signer, address) {
     const roleId = await contract.FACILITATOR_ROLE()
     await contract.grantRole(roleId, address)
 }
+
+export async function revokeFacilitatorRole(signer, address) {
+    const contract = new ethers.Contract(lockerContractAddress, lockerAbi, signer)
+    const roleId = await contract.FACILITATOR_ROLE()
+    await contract.revokeRole(roleId, address)
+}

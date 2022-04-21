@@ -14,3 +14,13 @@ export async function getCohorts(facilitatorAddress) {
     const res = await axios.get(`/api/cohorts/${facilitatorAddress}`)
     return res.data
 }
+
+export async function getAvailableCohorts() {
+    const res = await axios.get('/api/cohorts')
+    return res.data
+}
+
+export async function getMyInvitations(walletAddress) {
+    const res = await axios.get(`/api/invitations/${walletAddress}`)
+    return res.data
+}

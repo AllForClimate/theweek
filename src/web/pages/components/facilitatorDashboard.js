@@ -16,7 +16,7 @@ export default function FacilitatorDashboard() {
         }
     })
 
-    const dateFormatter = Intl.DateTimeFormat(navigator.languages,  { dateStyle: 'medium', timeStyle: 'medium'})
+    const dateFormatter = Intl.DateTimeFormat(navigator.languages,  { dateStyle: 'medium', timeStyle: 'short'})
 
     return (<Box>
         <h1>Facilitator</h1>
@@ -33,7 +33,7 @@ export default function FacilitatorDashboard() {
                 </TableHead>
                 <TableBody>
                     {cohorts && cohorts.map((cohort, idx) => (
-                        <TableRow>
+                        <TableRow key={idx}>
                             <TableCell>{idx}</TableCell>
                             <TableCell>{dateFormatter.format(new Date(cohort.datetimeEp1))}</TableCell>
                             <TableCell>{dateFormatter.format(new Date(cohort.datetimeEp2))}</TableCell>

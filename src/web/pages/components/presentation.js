@@ -31,7 +31,7 @@ export default function Presentation() {
       <Box sx={{ flexGrow: '1', display:'flex', alignItems:'center', flexDirection:'column'}}>
         <Button onClick={state.tryConnect} variant="contained" sx={{ padding: '1rem', margin:'1rem 0'}}>Connect</Button>
       </Box>
-      <Typography variant="h2" align="center">and go through <nobr><Link target="_blank" href="https://theweek-prototype.weebly.com/">"The Week"</Link>'s</nobr> process</Typography>
+      <Typography variant="h2" align="center">go through <nobr><Link target="_blank" href="https://theweek-prototype.weebly.com/">"The Week"</Link>'s</nobr> process</Typography>
     </Stack>
   </ThemeProvider>
 }

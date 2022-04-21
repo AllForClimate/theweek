@@ -37,13 +37,6 @@ export default async function handler(req, res) {
             } finally {
                 resolve()
             }
-        } else if(req.method === 'GET') {
-            await executeOnDb(async dbs => {
-                const now = new Date()
-                const availableCohortsRes = await dbs.cohorts.query(cohort => new Date(cohort.confirmationDeadline) > now)
-                res.status(200).json(availableCohortsRes)
-            })
-            resolve()
         } else {
             res.status(501).end()
             resolve()

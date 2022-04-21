@@ -59,7 +59,8 @@ export function AppWrapper({ children }) {
     tryConnect,
     mergeWithState,
     autoConnecting:false,
-    setError
+    setError,
+    currentView: 0,
   })
   useEffect(async () => {
     if(!state.walletAddress && localStorage.getItem('walletAddress') && !state.autoConnecting && !state.errorMsg && !state.triedConnecting) {

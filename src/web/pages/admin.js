@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAppContext } from './components/appState'
 import { Button, Box, CircularProgress, Table, TableBody, TableCell, 
     TableContainer, TableHead, TableRow, Stack, TextField } from '@mui/material'
-import { getFacilitators, grantFacilitatorRole  } from './lib/lockerContractFacade'
+import { getFacilitators, grantFacilitatorRole, revokeFacilitatorRole  } from './lib/lockerContractFacade'
 import DeleteRounded from '@mui/icons-material/DeleteRounded'
 
 export default function Admin() {
@@ -34,10 +34,18 @@ export default function Admin() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {facilitators.map(walletAddress => (
-                            <TableRow>
+                        {facilitators.map((walletAddress, idx) => (
+                            <TableRow key={idx}>
                                 <TableCell>{walletAddress}</TableCell>
-                                <TableCell><DeleteRounded onClick={() => {}}/></TableCell>
+                                <TableCell><Button onClick={async () => {
+                                    try {
+                                        await revokeFacilitatorRole(state.signer, walletAddress)
+                                    }
+                                    catch(e) {
+                                        state.setError(state, `Error while executing this request: ${e.message}`)
+                                        console.log(e)
+                                    }
+                                }}><DeleteRounded /></Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -45,7 +53,15 @@ export default function Admin() {
             </TableContainer>
             <Stack component="form" direction="row">
                 <TextField required label="Wallet address" value={newFacilitatorAddress} onChange={e => setNewFacilitatorAddress(e.target.value)}></TextField>
-                <Button variant="contained" onClick={async () => { await grantFacilitatorRole(state.signer, newFacilitatorAddress) }}>Grant facilitator role</Button>
+                <Button variant="contained" onClick={async () => { 
+                    try {
+                        await grantFacilitatorRole(state.signer, newFacilitatorAddress) 
+                    }
+                    catch(e) {
+                        state.setError(state, `Error while executing this request: ${e.message}`)
+                        console.log(e)
+                    }
+                }}>Grant facilitator role</Button>
             </Stack>
         </Stack>)
     }

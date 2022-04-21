@@ -1,6 +1,26 @@
 const Locker = artifacts.require('Locker');
 
 contract('Locker', accounts => {
+    it('should not add an account to the facilitator role if unauthorized', async () => {
+        let locker = await Locker.deployed()
+        let facilitatorRole = await locker.FACILITATOR_ROLE.call()
+        try {
+            await locker.grantRole(facilitatorRole, accounts[1], { from : accounts[1]})
+            assert.fail('Should not grant role if unauthorized.')
+        } catch(e) {
+            assert.isTrue(e.message.includes('missing role'))
+        }
+    })   
+    it('should not revoke a role if unauthorized', async () => {
+        let locker = await Locker.deployed()
+        let facilitatorRole = await locker.FACILITATOR_ROLE.call()
+        try {
+            await locker.revokeRole(facilitatorRole, accounts[1], { from : accounts[1]})
+            assert.fail('Should not revoke role if unauthorized.')
+        } catch(e) {
+            assert.isTrue(e.message.includes('missing role'))
+        }
+    })   
     it('should add an account to the facilitator role', async () => {
         let locker = await Locker.deployed()
         let facilitatorRole = await locker.FACILITATOR_ROLE.call()
@@ -29,16 +49,61 @@ contract('Locker', accounts => {
         let facilitators = await locker.getFacilitatorAddresses()
         assert.equal(facilitators.length, 0)
     })
-    it('should be pausable', () => {
-        assert.fail('Not implemented')
+    
+    it('should lock exactly 6 Matics', async () =>  {
+        const locker = await Locker.deployed()
+        const eventId = 'event'
+        await locker.lockFunds(eventId, {from: accounts[3], value: 6})
+        const lockedFund = await locker.events.call(eventId, accounts[3])
+        assert.equal(lockedFund.amount, 6)
+        assert.equal(lockedFund.status, Locker.LockedFundStatus.pending)
+        assert.equal(await locker.eventAddresses.call(eventId, 0), accounts[3])
+        assert.equal(6, await web3.eth.getBalance(locker.address))
     })
-    it('should lock exactly 6 Matics, and keep track of who did lock them', () =>  {
-        assert.fail('Not implemented')
+    it('should fail to lock anything else than exactly 6 Matics', async () =>  {
+        const locker = await Locker.deployed()
+        const eventId = 'event'
+        try {
+            await locker.lockFunds(eventId, {from: accounts[3], value: 5})
+            assert.fail('Should not allow locking that amount of fund')
+        } catch(e) {
+            assert.isTrue(e.message.includes('Invalid amount'))
+        }
     })
-    it('should refund a given deposit', () =>  {
-        assert.fail('Not implemented')
+    it('should fail locking funds twice for the same event', async () =>  {
+        const locker = await Locker.deployed()
+        const eventId = 'event'
+        try {
+            await locker.lockFunds(eventId, {from: accounts[3], value: 6})
+            assert.fail('Should not allow locking twice for the same event')
+        } catch(e) {
+            assert.isTrue(e.message.includes('Already locked'))
+        }
     })
-    it('should not refund a given deposit if the caller is no facilitator', () =>  {
-        assert.fail('Not implemented')
+    it('should not finalize event if unauthorized', async () =>  {
+        let locker = await Locker.deployed()
+        //let fundClerkRole = await locker.FUNDS_CLERK_ROLE.call()
+        try {
+            await locker.finalizeDeposit('event', [], { from : accounts[3]});
+            assert.fail('Should not refund if unauthorized.')
+        } catch(e) {
+            assert.isTrue(e.message.includes('Unauthorized'))
+        }
+    })
+    it('should finalize a given event', async () =>  {
+        let locker = await Locker.deployed()
+        let fundClerkRole = await locker.FUNDS_CLERK_ROLE.call()
+        const eventId = 'event1'
+        await locker.lockFunds(eventId, {from: accounts[3], value: 6})
+        await locker.lockFunds(eventId, {from: accounts[4], value: 6})
+        await locker.lockFunds(eventId, {from: accounts[5], value: 6})
+        await locker.grantRole(fundClerkRole, accounts[2])
+        await locker.finalizeDeposit(eventId, [accounts[4]], { from : accounts[2]})
+        const lockedFund = await locker.events.call(eventId, accounts[4])
+        assert.equal(lockedFund.status, Locker.LockedFundStatus.toBeRefunded)
+        const lockedFund1 = await locker.events.call(eventId, accounts[3])
+        assert.equal(lockedFund1.status, Locker.LockedFundStatus.toBeSeized)
+        const lockedFund2 = await locker.events.call(eventId, accounts[5])
+        assert.equal(lockedFund2.status, Locker.LockedFundStatus.toBeSeized)
     })
 })

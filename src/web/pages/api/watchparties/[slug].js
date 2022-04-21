@@ -3,10 +3,10 @@ import logger from '../../lib/logger'
 
 export default async function handler(req, res) {
     return new Promise(async resolve => {
-        const { walletAddress } = req.query
+        const { slug } = req.query
         try {
             await executeOnDb(async dbs => {
-                res.status(200).json(await dbs.cohorts.query(cohort => cohort.facilitatorAddress === walletAddress))    
+                res.status(200).json(await dbs.watchParties.query(watchParty => watchParty.slug === slug))    
             })
         } catch(e) {
             logger.error(e)
