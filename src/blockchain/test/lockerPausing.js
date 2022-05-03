@@ -35,6 +35,6 @@ contract('Locker unpausable', accounts => {
         await locker.pause({ from: accounts[0]})
         await assertFailsBecausePaused(locker.lockFunds('event', {from: accounts[3]}))
         await locker.unpause({ from: accounts[0] })
-        await locker.lockFunds('event', {from: accounts[3], value: 6})
+        await locker.lockFunds('event', {from: accounts[3], value: web3.utils.toWei('6', 'ether')})
     })
 })

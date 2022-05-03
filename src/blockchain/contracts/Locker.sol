@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/security/pausable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract Locker is AccessControl, Pausable {
+
+contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable {
   EnumerableSet.AddressSet private _facilitators;
   uint public amountToLock;
   enum LockedFundStatus {
@@ -25,9 +27,15 @@ contract Locker is AccessControl, Pausable {
   mapping(string => mapping(address => LockedFund)) public events;
   mapping(string => address[]) public eventAddresses;
 
-  constructor(address admin) {
+  function initialize (address admin) public initializer {
+    AccessControlUpgradeable.__AccessControl_init();
+    PausableUpgradeable.__Pausable_init();
     _grantRole(DEFAULT_ADMIN_ROLE, admin);
-    amountToLock = 6;
+    amountToLock = 6000000000000000000;
+  }
+
+  function setAmountToLock (uint newAmountInWei) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    amountToLock = newAmountInWei;
   }
 
   bytes32 public constant FACILITATOR_ROLE = keccak256("FACILITATOR_ROLE");

@@ -10,6 +10,16 @@ export async function createCohort(data){
     })
 }
 
+export async function createWatchparty(data) {
+    const res = await axios.put('/api/watchparties', data)
+    return res.data
+}
+
+export async function createCandidateParticipant(data) {
+    const res = await axios.put('/api/candidateParticipants', data)
+    return res.data
+}
+
 export async function getCohorts(facilitatorAddress) {
     const res = await axios.get(`/api/cohorts/${facilitatorAddress}`)
     return res.data
@@ -22,5 +32,10 @@ export async function getAvailableCohorts() {
 
 export async function getMyInvitations(walletAddress) {
     const res = await axios.get(`/api/invitations/${walletAddress}`)
+    return res.data
+}
+
+export async function getWatchparty(slug) {
+    const res = await axios.get(`/api/watchparties/${slug}`)
     return res.data
 }

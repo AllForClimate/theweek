@@ -19,7 +19,8 @@ export function AppWrapper({ children }) {
         localStorage.setItem('walletAddress', walletAddress)
         const signerIsFacilitator = await isFacilitator(signer)
         mergeWithState(state, { 
-          walletAddress, 
+          walletAddress,
+          provider,
           signer, 
           autoConnecting: false, 
           isFacilitator: signerIsFacilitator,

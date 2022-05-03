@@ -1,6 +1,7 @@
 import { executeOnDb } from '../lib/Db.js'
 import { CID } from 'ipfs'
 import { randomUUID } from 'crypto'
+import logger from '../lib/logger'
 
 export default async function handler(req, res) {
     return new Promise(async resolve => {
@@ -27,23 +28,29 @@ export default async function handler(req, res) {
                                 confirmationDeadline: confirmationDeadline.toISOString()
                             })
                             const cid = CID.parse(cidStr)
-                            res.status(200).json(await dbs.node.dag.get(cid))
+                            res.status(200).json({ cid })
                         })
                     }
                 }
-            }
-            catch(e) {
+            } catch(e) {
+                logger.error(e)
                 res.status(500).json({ error: 'Unexpected error : ' + e })
             } finally {
                 resolve()
             }
         } else if(req.method === 'GET') {
-            await executeOnDb(async dbs => {
-                const now = new Date()
-                const availableCohortsRes = await dbs.cohorts.query(cohort => new Date(cohort.confirmationDeadline) > now)
-                res.status(200).json(availableCohortsRes)
-            })
-            resolve()
+            try {
+                await executeOnDb(async dbs => {
+                    const now = new Date()
+                    const availableCohortsRes = await dbs.cohorts.query(cohort => new Date(cohort.confirmationDeadline) > now)
+                    res.status(200).json(availableCohortsRes)
+                })
+            } catch(e) {
+                logger.error(e)
+                res.status(500).json({ error: 'Unexpected error : ' + e })
+            } finally {
+                resolve()
+            }
         } else {
             res.status(501).end()
             resolve()

@@ -12,7 +12,7 @@ import OrbitDB from 'orbit-db'
 export async function executeOnDb(operations)  {
     const createNode = () => create({
       preload: { enabled: false },
-      repo: './ipfs',
+      repo: process.env.IPFS_REPO,
       EXPERIMENTAL: { pubsub: true },
       config: {
         Bootstrap: [],
@@ -23,10 +23,12 @@ export async function executeOnDb(operations)  {
     const node = await createNode()
     const orbitDb = await OrbitDB.createInstance(node)
     const cohorts = await orbitDb.docstore('cohorts', { accessController: { write: [orbitDb.identity.id] }})
-    const watchParties = await orbitDb.docstore('watchParties', { accessController: { write: [orbitDb.identity.id] }})
+    const watchparties = await orbitDb.docstore('watchparties', { indexBy: 'slug', accessController: { write: [orbitDb.identity.id] }})
+    const candidateParticipants = await orbitDb.docstore('candidateParticipants', { accessController: { write: [orbitDb.identity.id] }})
+    const organizers = await orbitDb.keyvalue('organizers')
     await cohorts.load()
-    await watchParties.load()
-    const dbs = { cohorts, watchParties, node }
+    await watchparties.load()
+    const dbs = { cohorts, watchparties, node, candidateParticipants, organizers }
     try {
       await operations(dbs)
     }

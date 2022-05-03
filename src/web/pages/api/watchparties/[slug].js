@@ -6,7 +6,12 @@ export default async function handler(req, res) {
         const { slug } = req.query
         try {
             await executeOnDb(async dbs => {
-                res.status(200).json(await dbs.watchParties.query(watchParty => watchParty.slug === slug))    
+                const watchparties = await dbs.watchparties.query(watchparty => watchparty.slug === slug)
+                if (watchparties.length === 0) {
+                    res.status(404)
+                } else {
+                    res.status(200).json(watchparties[0])   
+                }
             })
         } catch(e) {
             logger.error(e)

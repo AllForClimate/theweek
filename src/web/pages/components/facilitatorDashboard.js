@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Box, TableContainer, Table, TableBody, TableCell, TableHead, 
-    TableRow, Button, Dialog } from '@mui/material'
+    TableRow, Button, Dialog, CircularProgress } from '@mui/material'
 import { getCohorts } from '../lib/apiFacade'
 import CohortEdit from './cohortEdit'
 import { useAppContext } from './appState'
@@ -20,6 +20,7 @@ export default function FacilitatorDashboard() {
 
     return (<Box>
         <h1>Facilitator</h1>
+        {cohorts === null && <CircularProgress />}
         <TableContainer>
             <Table>
                 <TableHead>

@@ -1,5 +1,7 @@
 const Locker = artifacts.require('Locker');
 
+const amountToLock = web3.utils.toWei('6', 'ether')
+
 contract('Locker', accounts => {
     it('should not add an account to the facilitator role if unauthorized', async () => {
         let locker = await Locker.deployed()
@@ -53,12 +55,12 @@ contract('Locker', accounts => {
     it('should lock exactly 6 Matics', async () =>  {
         const locker = await Locker.deployed()
         const eventId = 'event'
-        await locker.lockFunds(eventId, {from: accounts[3], value: 6})
+        await locker.lockFunds(eventId, {from: accounts[3], value: web3.utils.toWei('6', 'ether')})
         const lockedFund = await locker.events.call(eventId, accounts[3])
-        assert.equal(lockedFund.amount, 6)
+        assert.equal(lockedFund.amount, amountToLock)
         assert.equal(lockedFund.status, Locker.LockedFundStatus.pending)
         assert.equal(await locker.eventAddresses.call(eventId, 0), accounts[3])
-        assert.equal(6, await web3.eth.getBalance(locker.address))
+        assert.equal(amountToLock, await web3.eth.getBalance(locker.address))
     })
     it('should fail to lock anything else than exactly 6 Matics', async () =>  {
         const locker = await Locker.deployed()
@@ -74,7 +76,7 @@ contract('Locker', accounts => {
         const locker = await Locker.deployed()
         const eventId = 'event'
         try {
-            await locker.lockFunds(eventId, {from: accounts[3], value: 6})
+            await locker.lockFunds(eventId, {from: accounts[3], value: amountToLock})
             assert.fail('Should not allow locking twice for the same event')
         } catch(e) {
             assert.isTrue(e.message.includes('Already locked'))
@@ -94,9 +96,9 @@ contract('Locker', accounts => {
         let locker = await Locker.deployed()
         let fundClerkRole = await locker.FUNDS_CLERK_ROLE.call()
         const eventId = 'event1'
-        await locker.lockFunds(eventId, {from: accounts[3], value: 6})
-        await locker.lockFunds(eventId, {from: accounts[4], value: 6})
-        await locker.lockFunds(eventId, {from: accounts[5], value: 6})
+        await locker.lockFunds(eventId, {from: accounts[3], value: amountToLock})
+        await locker.lockFunds(eventId, {from: accounts[4], value: amountToLock})
+        await locker.lockFunds(eventId, {from: accounts[5], value: amountToLock})
         await locker.grantRole(fundClerkRole, accounts[2])
         await locker.finalizeDeposit(eventId, [accounts[4]], { from : accounts[2]})
         const lockedFund = await locker.events.call(eventId, accounts[4])
@@ -105,5 +107,21 @@ contract('Locker', accounts => {
         assert.equal(lockedFund1.status, Locker.LockedFundStatus.toBeSeized)
         const lockedFund2 = await locker.events.call(eventId, accounts[5])
         assert.equal(lockedFund2.status, Locker.LockedFundStatus.toBeSeized)
+    })
+    it('should change the amount of wei to lock', async() => {
+        let locker = await Locker.deployed()
+        const eventId = 'event'
+        await locker.setAmountToLock('4000000000000000000')
+        try {
+            await locker.lockFunds(eventId, {from: accounts[6], value: amountToLock})
+            assert.fail('Should refuse to lock this amount (we should have changed it')
+        }
+        catch(e){
+            assert.isTrue(e.message.includes('Invalid amount'))
+        }
+        await locker.lockFunds(eventId, {from: accounts[6], value: '4000000000000000000'})
+        const lockedFund = await locker.events.call(eventId, accounts[6])
+        assert.equal(lockedFund.amount, '4000000000000000000')
+        assert.equal(lockedFund.status, Locker.LockedFundStatus.pending)
     })
 })

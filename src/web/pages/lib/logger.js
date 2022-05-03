@@ -1,4 +1,4 @@
-import { createLogger, config, transports } from 'winston'
+import { createLogger, config, transports, format } from 'winston'
 
 const options = {
   file: {
@@ -19,6 +19,10 @@ const options = {
 };
 
 const logger = createLogger({
+  format: format.combine(
+    format.timestamp(),
+    format.json()
+  ),
   levels: config.npm.levels,
   transports: [
     new transports.File(options.file),
