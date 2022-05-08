@@ -6,10 +6,11 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-
 contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable {
   EnumerableSet.AddressSet private _facilitators;
   uint public amountToLock;
+  address payable private daoTreasureAddress;
+  uint private nextEventIndex;
   enum LockedFundStatus {
     pending, 
     toBeRefunded,
@@ -21,17 +22,22 @@ contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable 
     LockedFundStatus status;
     uint amount;
   }
-  string[] eventIds;
+
+  mapping(string => uint256) internal eventIndexes;
+  mapping(uint256 => string) internal eventByIndex;
+  EnumerableSet.UintSet eventsToScanForSeizable;
 
   // maps events to funds locked by individual addresses
   mapping(string => mapping(address => LockedFund)) public events;
   mapping(string => address[]) public eventAddresses;
 
-  function initialize (address admin) public initializer {
+  function initialize (address admin, address payable daoTreasure) public initializer {
     AccessControlUpgradeable.__AccessControl_init();
     PausableUpgradeable.__Pausable_init();
     _grantRole(DEFAULT_ADMIN_ROLE, admin);
     amountToLock = 6000000000000000000;
+    nextEventIndex = 1;
+    daoTreasureAddress = daoTreasure;
   }
 
   function setAmountToLock (uint newAmountInWei) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -64,7 +70,12 @@ contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable 
     // Checks the same address did not already lock funds for the same event
     require(events[eventId][msg.sender].amount == 0, 'Already locked funds for this event');
     if(eventAddresses[eventId].length == 0) {
-      eventIds.push(eventId);
+      //Need to define a uint index for each event, and a way to get the eventId from its index, and vice versa
+      //This is because we want to use a enumerable set to keep track of the events that need 
+      //to be seized (otherwise the contract would have to loop each time through all the events ever created)
+      //Enumerable sets have no handling of strings, but well of uint, hence the need to map our string event ids to uint's
+      eventIndexes[eventId] = nextEventIndex ++;
+      eventByIndex[eventIndexes[eventId]] = eventId;
     }
     eventAddresses[eventId].push(msg.sender);
     events[eventId][msg.sender] = LockedFund(LockedFundStatus.pending, msg.value);
@@ -110,11 +121,28 @@ contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable 
           events[eventId][addressesToSeize[i]].status = LockedFundStatus.toBeSeized;
         }
     }
+    if(addressesToSeize.length > 0) {
+      EnumerableSet.add(eventsToScanForSeizable, eventIndexes[eventId]);
+    }
   }
 
   function withdrawSeizedFundsToDAOTreasure() public whenNotPaused {
     require(hasRole(DEFAULT_ADMIN_ROLE ,msg.sender) || hasRole(FUNDS_CLERK_ROLE, msg.sender), 'Unauthorized');
-
+    uint amountToSeize = 0;
+    while(EnumerableSet.length(eventsToScanForSeizable) > 0) {
+      uint currentEventIndex = EnumerableSet.at(eventsToScanForSeizable, 0);
+      address[] memory currentEventAddresses = eventAddresses[eventByIndex[currentEventIndex]];
+      for (uint j = 0; j < currentEventAddresses.length; j ++) {
+        if(events[eventByIndex[currentEventIndex]][currentEventAddresses[j]].status == LockedFundStatus.toBeSeized) {
+          amountToSeize += events[eventByIndex[currentEventIndex]][currentEventAddresses[j]].amount;
+          events[eventByIndex[currentEventIndex]][currentEventAddresses[j]].status = LockedFundStatus.seized;
+        }
+      }
+      EnumerableSet.remove(eventsToScanForSeizable, currentEventIndex);
+    }
+    if(amountToSeize > 0) {
+      daoTreasureAddress.transfer(amountToSeize);
+    }
   }
 
   function pause() public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -123,5 +151,18 @@ contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable 
 
   function unpause() public whenPaused onlyRole(DEFAULT_ADMIN_ROLE) {
     _unpause();
+  }
+
+  //Safety method to allow the administrator to set a fund as refundable
+  function overrideMakeRefundable(string calldata eventId, address account) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    LockedFund storage lockedFund= events[eventId][account];
+    require(lockedFund.amount > 0, 'No locked fund found.');
+    require(lockedFund.status != LockedFundStatus.refunded && lockedFund.status != LockedFundStatus.seized, 'Funds have been seized or refunded already.');
+    lockedFund.status = LockedFundStatus.toBeRefunded;
+  }
+
+  function setDaoTreasureAddress(address payable newDaoTreasureAddress) public whenNotPaused {
+    require(hasRole(DEFAULT_ADMIN_ROLE ,msg.sender) || hasRole(FUNDS_CLERK_ROLE, msg.sender), 'Unauthorized');
+    daoTreasureAddress = newDaoTreasureAddress;
   }
 }

@@ -9,10 +9,10 @@ import OrbitDB from 'orbit-db'
 // which fails because the file-based lock is still active on the node. This is an blocking issue when using 
 // NextJs for development, and this is the only workaround I found (hopefully it won't affect perf too much,
 // in which case I'll have to make some logic to close and recreate a node only when we are in dev)
-export async function executeOnDb(operations)  {
+export async function executeOnDb(operations, repoPath)  {
     const createNode = () => create({
       preload: { enabled: false },
-      repo: process.env.IPFS_REPO,
+      repo: repoPath,
       EXPERIMENTAL: { pubsub: true },
       config: {
         Bootstrap: [],
@@ -28,6 +28,8 @@ export async function executeOnDb(operations)  {
     const organizers = await orbitDb.keyvalue('organizers')
     await cohorts.load()
     await watchparties.load()
+    await candidateParticipants.load()
+    await organizers.load()
     const dbs = { cohorts, watchparties, node, candidateParticipants, organizers }
     try {
       await operations(dbs)

@@ -1,5 +1,5 @@
-const lockerAbi = require('./pages/locker-abi.json')
-const { ethers, BigNumber } = require('ethers')
+const lockerAbi = require('../pages/locker-abi.json')
+const { ethers } = require('ethers')
 
 // const lockerContractAddress = '0x240a5a2f6FDc8528B37D2b07b89a3461844D0Cb1'
 // const provider = new ethers.providers.JsonRpcProvider('https://matic-mumbai.chainstacklabs.com')

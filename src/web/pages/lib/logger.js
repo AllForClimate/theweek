@@ -20,6 +20,7 @@ const options = {
 
 const logger = createLogger({
   format: format.combine(
+    format.errors({ stack: true }),
     format.timestamp(),
     format.json()
   ),

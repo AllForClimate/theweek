@@ -12,20 +12,19 @@ export default async function handler(req, res) {
                 } else {
                     await executeOnDb(async dbs => {
                         const organizer = await dbs.organizers.get(req.body.watchpartySlug)
-                        console.log(`organizer: ${organizer}`)
+                        const participantId = randomUUID()
                         const cidParticipantStr = await dbs.candidateParticipants.put({
-                            _id: randomUUID(),
+                            _id: participantId,
                             address: req.body.address,
                             cohorts: req.body.cohorts,
                             txLock: req.body.txLock,
                             watchparty: req.body.watchpartySlug
                         })
-                        const cidParticipant = CID.parse(cidParticipantStr)
                         if(!organizer) {
-                            dbs.organizers.put(req.body.watchpartySlug, cidParticipant)
+                            dbs.organizers.put(req.body.watchpartySlug, participantId)
                         }
-                        res.status(200).json({ cid: cidParticipant })
-                    })
+                        res.status(200).json({ _id: participantId })
+                    }, process.env.IPFS_REPO)
                 }
             }
             catch(e) {

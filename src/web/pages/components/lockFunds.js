@@ -26,7 +26,7 @@ export default function LockFunds({ onLocking }) {
         { ['none of the dates you picked are confirmed', 
         'the watch party is confirmed, and you show up to all episodes', 
         'the watch party is confirmed, but then cancelled from our side (exceptionnal)']
-        .map(text => <Stack direction="row"><CheckCircleOutline color="success"/>{text}</Stack>)}
+        .map((text, idx) => <Stack key={idx} direction="row"><CheckCircleOutline color="success"/>{text}</Stack>)}
         </Typography>
         <Typography variant="subtitle1">Otherwise, we keep your MATIC's in our DAO, sorry.</Typography>
         <Button variant="contained" onClick={async () => {

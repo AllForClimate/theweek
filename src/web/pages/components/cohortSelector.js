@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Stack, Typography, Card, CardContent, CardActions, Button, CircularProgress } from '@mui/material'
+import { Stack, Typography, Card, CardContent, CardActions, CircularProgress } from '@mui/material'
 import { DateTime, Interval } from 'luxon'
 import { getAvailableCohorts } from '../lib/apiFacade'
 
-export default function CohortSelector({value, onChange}) {
+export default function CohortSelector({value, onChange, watchpartyCohorts}) {
     const [cohorts, setCohorts] = useState(null)
-    const dateFormatter = Intl.DateTimeFormat(navigator.languages,  { dateStyle: 'medium', timeStyle: 'short'})
-    const shortDateFormatter = Intl.DateTimeFormat(navigator.languages,  { dateStyle: 'short', timeStyle: 'short'})
 
     useEffect(async () => {
         if(!cohorts) {
@@ -15,7 +13,10 @@ export default function CohortSelector({value, onChange}) {
                 nextWeek:[],
                 later:[]                
             }
-            const rawCohorts = await getAvailableCohorts()
+            let rawCohorts = await getAvailableCohorts()
+            if(watchpartyCohorts)
+                rawCohorts = rawCohorts.filter(cohort => watchpartyCohorts.includes(cohort._id))
+                
             const endOfCurrentWeek = DateTime.now().endOf('week')
             rawCohorts.forEach(cohort => {
                 const cohortEp1Datetime = DateTime.fromISO(cohort.datetimeEp1)
