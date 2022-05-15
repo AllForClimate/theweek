@@ -1,4 +1,4 @@
-import lockerAbi from '../locker-abi.json'
+import lockerAbi from '../pages/locker-abi.json'
 import { ethers } from 'ethers'
 
 const lockerContractAddress = process.env.NEXT_PUBLIC_LOCKER_CONTRACT_ADDRESS
@@ -60,6 +60,23 @@ export async function getAmountToLock(signer) {
 export async function setAmountToLock(signer, provider, newAmountToLock) {
     const contract = new ethers.Contract(lockerContractAddress, lockerAbi, signer)
     const txRes = await contract.setAmountToLock(newAmountToLock)
+    try {
+        await txRes.wait()
+    } catch(e) {
+        const error = await findFailureInfo(txRes.hash, provider)
+        throw error
+    }
+}
+
+export async function getDaoAddress(signer) {
+    const contract = new ethers.Contract(lockerContractAddress, lockerAbi, signer)
+    const daoAddress = await contract.daoTreasureAddress.call()
+    return daoAddress  
+}
+
+export async function setDaoAddress(signer, provider, newDaoAddress) {
+    const contract = new ethers.Contract(lockerContractAddress, lockerAbi, signer)
+    const txRes = await contract.setDaoTreasureAddress(newDaoAddress)
     try {
         await txRes.wait()
     } catch(e) {

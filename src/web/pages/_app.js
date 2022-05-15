@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import { Container } from '@mui/material'
-import { AppWrapper } from './components/appState'
+import { AppWrapper } from '../lib/appState'
 
 function MyApp({ Component, pageProps }) {
   return <AppWrapper>

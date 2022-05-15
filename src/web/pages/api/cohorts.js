@@ -1,7 +1,7 @@
-import { executeOnDb } from '../lib/Db.js'
+import { executeOnDb } from '../../lib/Db.js'
 import { CID } from 'ipfs'
 import { randomUUID } from 'crypto'
-import logger from '../lib/logger'
+import logger from '../../lib/logger'
 
 export default async function handler(req, res) {
     return new Promise(async resolve => {

@@ -5,9 +5,9 @@ import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import CohortSelector from './cohortSelector'
 import LockFunds from './lockFunds'
-import { useAppContext } from './appState'
-import { lockFunds } from '../lib/lockerContractFacade'
-import { createWatchparty, createCandidateParticipant } from '../lib/apiFacade'
+import { useAppContext } from '../../lib/appState'
+import { lockFunds } from '../../lib/lockerContractFacade'
+import { createWatchparty, createCandidateParticipant } from '../../lib/apiFacade'
 
 const baseUrl = process.env.NEXT_PUBLIC_WEBSITE_PUBLIC_URL
 

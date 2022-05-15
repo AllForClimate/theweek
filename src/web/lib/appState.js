@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { Button, Snackbar, Alert } from '@mui/material'
-import { isFacilitator  } from '../lib/lockerContractFacade'
+import { isFacilitator  } from './lockerContractFacade'
 
 const AppContext = createContext();
 

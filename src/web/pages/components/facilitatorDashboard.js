@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react'
 import { Box, TableContainer, Table, TableBody, TableCell, TableHead, 
     TableRow, Button, Dialog, CircularProgress } from '@mui/material'
-import { getCohorts } from '../lib/apiFacade'
+import { getCohorts } from '../../lib/apiFacade'
 import CohortEdit from './cohortEdit'
-import { useAppContext } from './appState'
+import { useAppContext } from '../../lib/appState'
 
 export default function FacilitatorDashboard() {
     const [cohorts, setCohorts] = useState(null)
     const [newCohortDialogOpen, setNewCohortDialogOpen] = useState(false)
     const [state] = useAppContext()
+    let dateFormatter
 
     useEffect(async () => {
         if(!cohorts) {
             setCohorts(await getCohorts(state.walletAddress))
+            dateFormatter = Intl.DateTimeFormat(window.navigator.languages,  { dateStyle: 'medium', timeStyle: 'short'})
         }
     })
-
-    const dateFormatter = Intl.DateTimeFormat(navigator.languages,  { dateStyle: 'medium', timeStyle: 'short'})
 
     return (<Box>
         <h1>Facilitator</h1>

@@ -3,12 +3,12 @@ import { useRouter } from 'next/router'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { Box, CircularProgress, Typography, Button, Stack, Stepper, Step, StepLabel, MobileStepper } from '@mui/material'
-import { getWatchparty } from '../lib/apiFacade'
+import { getWatchparty } from '../../lib/apiFacade'
 import CohortSelector from '../components/cohortSelector'
 import LockFunds from '../components/lockFunds'
-import { useAppContext } from '../components/appState'
-import { lockFunds } from '../lib/lockerContractFacade'
-import { createCandidateParticipant } from '../lib/apiFacade'
+import { useAppContext } from '../../lib/appState'
+import { lockFunds } from '../../lib/lockerContractFacade'
+import { createCandidateParticipant } from '../../lib/apiFacade'
 
 export default function Watchparties() {
     const router = useRouter()

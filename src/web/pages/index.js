@@ -1,4 +1,4 @@
-import { useAppContext } from './components/appState'
+import { useAppContext } from '../lib/appState'
 import { Box } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'

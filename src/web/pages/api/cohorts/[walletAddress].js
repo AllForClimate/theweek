@@ -1,5 +1,5 @@
-import { executeOnDb } from '../../lib/Db.js'
-import logger from '../../lib/logger'
+import { executeOnDb } from '../../../lib/Db.js'
+import logger from '../../../lib/logger'
 
 export default async function handler(req, res) {
     return new Promise(async resolve => {

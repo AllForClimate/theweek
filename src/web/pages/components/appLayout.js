@@ -6,7 +6,7 @@ import { BottomNavigation, BottomNavigationAction, AppBar,
 import GroupsIcon from '@mui/icons-material/Groups'
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useAppContext } from './appState'
+import { useAppContext } from '../../lib/appState'
 import Organize from './organize'
 import Invitations from './invitations'
 

@@ -1,7 +1,7 @@
 import { Stack, Typography, Button, Box, Link } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import HandshakeOutlined from '@mui/icons-material/HandshakeOutlined'
-import { useAppContext } from './appState'
+import { useAppContext } from '../../lib/appState'
 
 const theme = createTheme({
   typography: {
@@ -31,7 +31,7 @@ export default function Presentation() {
       <Box sx={{ flexGrow: '1', display:'flex', alignItems:'center', flexDirection:'column'}}>
         <Button onClick={state.tryConnect} variant="contained" sx={{ padding: '1rem', margin:'1rem 0'}}>Connect</Button>
       </Box>
-      <Typography variant="h2" align="center">go through <nobr><Link target="_blank" href="https://theweek-prototype.weebly.com/">"The Week"</Link>'s</nobr> process</Typography>
+      <Typography variant="h2" align="center">go through <nobr><Link target="_blank" href="https://theweek-prototype.weebly.com/">&quot;The Week&quot;</Link>&apos;s</nobr> process</Typography>
     </Stack>
   </ThemeProvider>
 }

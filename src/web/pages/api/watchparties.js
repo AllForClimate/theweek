@@ -1,6 +1,6 @@
-import { executeOnDb } from '../lib/Db.js'
+import { executeOnDb } from '../../lib/Db.js'
 import { CID } from 'ipfs'
-import logger from '../lib/logger'
+import logger from '../../lib/logger'
 
 
 function between(min, max) {  

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Stack, Typography, Card, CardContent, CardActions, CircularProgress } from '@mui/material'
 import { DateTime, Interval } from 'luxon'
-import { getAvailableCohorts } from '../lib/apiFacade'
+import { getAvailableCohorts } from '../../lib/apiFacade'
 
 export default function CohortSelector({value, onChange, watchpartyCohorts}) {
     const [cohorts, setCohorts] = useState(null)

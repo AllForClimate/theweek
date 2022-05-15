@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract Locker is Initializable, AccessControlUpgradeable, PausableUpgradeable {
   EnumerableSet.AddressSet private _facilitators;
   uint public amountToLock;
-  address payable private daoTreasureAddress;
+  address payable public daoTreasureAddress;
   uint private nextEventIndex;
   enum LockedFundStatus {
     pending, 
