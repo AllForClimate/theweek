@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# MacOs uninvited folder info file
+.DS_Store
+
+# File containing the seed phrase of the Metamask account used for truffle deployment on public networks
+.secret
